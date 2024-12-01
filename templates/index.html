@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <style>
+    body {
+      background-color: #1E1E2F; /* Slate Gray */
+      color: #4FC3F7; /* Electric Blue */
+      font-family: Arial, sans-serif;
+    }
+
+    .jumbotron {
+      background-color: #2B2B40; /* Dark Slate */
+      color: #4FC3F7; /* Electric Blue */
+      border-radius: 10px;
+    }
+
+    .drag-and-drop {
+      border: 2px dashed #4FC3F7; /* Electric Blue */
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      background-color: #2B2B40; /* Dark Slate */
+      color: #4FC3F7; /* Electric Blue */
+      cursor: pointer;
+    }
+
+    .drag-and-drop:hover {
+      background-color: #3A3A55; /* Lighter Slate */
+    }
+
+    #output {
+      margin-top: 15px;
+      max-width: 100%;
+      border: 2px solid #4FC3F7; /* Electric Blue */
+      border-radius: 5px;
+    }
+
+    .result-card {
+      background-color: #2B2B40; /* Dark Slate */
+      padding: 20px;
+      border-radius: 10px;
+      color: #4FC3F7; /* Electric Blue */
+      margin-top: 20px;
+    }
+
+    .btn-submit {
+      background-color: #4FC3F7; /* Electric Blue */
+      color: #1E1E2F; /* Slate Gray */
+      border: none;
+    }
+
+    .btn-submit:hover {
+      background-color: #71DFFF; /* Lighter Electric Blue */
+      color: #121212; /* Almost Black */
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Landing Page -->
+  <div class="jumbotron text-center">
+    <h1 class="display-4">Is this recyclable?</h1>
+    <p class="lead">Drag and drop your image to determine if your item is organic or recyclable.</p>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <!-- Drag-and-Drop Zone -->
+      <div class="col-md-6">
+        <form method="post" action="/" enctype="multipart/form-data" id="uploadForm">
+          <div class="drag-and-drop" id="dropZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+            Drag & Drop Image Here or Click to Upload
+            <input type="file" name="file" id="fileInput" style="display: none;" onchange="handleFileChange(event)">
+          </div>
+          <img id="output" />
+          <button type="submit" class="btn btn-submit btn-block mt-3">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="result-card text-center">
+          {% with messages = get_flashed_messages() %}
+          {% if messages %}
+          <h5>Waste Category: {{ messages[0] }}</h5>
+          <p>Probability: {{ messages[1] }}</p>
+          <img src="{{ url_for('static', filename=messages[2]) }}" alt="Uploaded Image" style="max-width: 100%;">
+          {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const output = document.getElementById('output');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    function handleFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          output.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      const file = event.dataTransfer.files[0];
+      if (file) {
+        fileInput.files = event.dataTransfer.files; // Update input element
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          output.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+    }
+  </script>
+</body>
+
+</html>
